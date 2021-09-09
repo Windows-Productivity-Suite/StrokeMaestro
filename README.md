@@ -6,4 +6,4 @@
 Starring this repo shall promote me to do more open source
 ## License
 
-[CC0 1.0 (Public Domain)](LICENSE.md)
+[MIT License](LICENSE.md)
