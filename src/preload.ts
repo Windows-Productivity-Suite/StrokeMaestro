@@ -7,13 +7,6 @@ window.addEventListener("DOMContentLoaded", () => {
       element.innerText = text;
     }
   };
-
-  for (const type of ["chrome", "node", "electron"]) {
-    replaceText(
-      `${type}-version`,
-      process.versions[type as keyof NodeJS.ProcessVersions]
-    );
-  }
   const keyCombinationMap: Map<string, string> = new Map();
   keyCombinationMap.set("LAlt+Key1", "Microsoft Teams");
   const strokeActions = (keys: string[]) => {

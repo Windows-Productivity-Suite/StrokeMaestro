@@ -10,10 +10,12 @@ function createWindow() {
       nodeIntegration: true,
     },
     width: 800,
+    icon: path.join(__dirname , "../icon.png"),
   });
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "../index.html"));
+  mainWindow.setMenu(null);
 }
 
 // This method will be called when Electron has finished

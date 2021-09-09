@@ -4,19 +4,28 @@
 <head>
     <meta charset="UTF-8" />
     <title>Hello World!</title>
+    <link rel="stylesheet" href="./blocks.css" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <meta http-equiv=" Content-Security-Policy " content="default-src 'self'; script-src 'self' " />
+    <meta http-equiv="X-Content-Security-Policy " content="default-src 'self'; script-src 'self' " />
 </head>
 
 <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>, Chromium
-    <span id="chrome-version"></span>, and Electron
-    <span id="electron-version"></span>.
-    <div id="curr-keys"></div>
-    <!-- You can also require other files to run in this process -->
-    <script src="./dist/renderer.js"></script>
+    <h1 class="block fixed center px-10">Stroke Maestro!</h1>
+    <dl>
+        <div class="block px-20 py-10 no-click">
+            <dt class="inline block accent fixed">Publisher</dt>
+            <dd class="inline wrapper block fixed"> <input type="text" placeholder="Type something...">
+            </dd>
+        </div>
+        <div class="block px-20 py-10 no-click">
+            <dt class="inline block accent fixed">Publisher</dt>
+            <dd class="inline wrapper block fixed"> <input type="text" placeholder="Type something...">
+            </dd>
+        </div>
+    </dl>
+    <button class="block px-20">Add more</button>
+    <script src="./dist/renderer.js "></script>
 </body>
 
 </html>
