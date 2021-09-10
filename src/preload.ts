@@ -9,7 +9,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const keyBindingsMap: Map<string, string> = new Map();
   const list = document.getElementById("keybindings");
   const keybindingDOMList: HTMLDivElement[] = [];
-  
+
   //--------------
   // Utils methods
   //--------------
@@ -24,21 +24,21 @@ window.addEventListener("DOMContentLoaded", () => {
       keyBindingsMap.set(keybinding[0], keybinding[1]);
     }
   };
-  
+
   //Refresh config
   const refreshConfig = () => {
     fs.writeFileSync(
       path.resolve(process.cwd(), "./storage.json"),
       JSON.stringify(
         {
-          keybindings: keyBindingsMap.entries(),
+          keybindings: Array.from(keyBindingsMap.entries()),
         },
         null,
         2
       )
     );
   };
-  
+
   //Listen to keystrokes
   const listenKeyStoke = (id: string) => {
     const elem: HTMLDivElement = keybindingDOMList[+id];
@@ -77,7 +77,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     );
   };
-  
+
   //Add a key value pair to the list
   const addItem = (
     appName: string = "AppName",
@@ -101,12 +101,12 @@ window.addEventListener("DOMContentLoaded", () => {
     list.appendChild(div);
     keybindingDOMList.push(div);
   };
-  
+
   //Render loaded combinations from config.
   const renderCombinations = () => {
     keyBindingsMap.forEach((value: string, key: string) => addItem(key, value));
   };
-  
+
   //TO-DO
   const strokeActions = (keys: string[]) => {
     if (keys[0] && keys[1]) {
@@ -129,7 +129,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   //-----------------
   //   App Body
-  //----------------- 
+  //-----------------
   loadConfig();
   renderCombinations();
   document.getElementById("button").addEventListener("click", () => addItem());

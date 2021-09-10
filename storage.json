@@ -1,5 +1,12 @@
 {
-    "keybindings": [
-        ["Microsoft Teams", "LAlt+Key1"]
+  "keybindings": [
+    [
+      "Microsoft Teams",
+      "LAlt+Key1"
+    ],
+    [
+      "AppName",
+      "A"
     ]
+  ]
 }
