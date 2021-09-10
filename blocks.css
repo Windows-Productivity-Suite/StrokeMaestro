@@ -3,6 +3,7 @@ body {
     --block-background-color: #fff;
     --block-accent-color: #00ae86;
     --block-shadow-color: #444;
+    font-size: x-large;
 }
 
 .block {
@@ -12,7 +13,7 @@ body {
     border-radius: 3px;
     padding: 4px 8px;
     background: var(--block-background-color);
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
     box-sizing: border-box;
     position: relative;
@@ -24,6 +25,7 @@ body {
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+    padding: 0.25rem 0.5rem;
 }
 
 .block.wrapper,

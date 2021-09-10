@@ -1,17 +1,116 @@
+const fs = require("fs");
+const path = require("path");
 window.addEventListener("DOMContentLoaded", () => {
+  //--------------
+  // Globals
+  //--------------
   const globalkey = require("globalkey");
   const activeWindows = require("node-process-windows");
-  const replaceText = (selector: string, text: string) => {
-    const element = document.getElementById(selector);
-    if (element) {
-      element.innerText = text;
+  const keyBindingsMap: Map<string, string> = new Map();
+  const list = document.getElementById("keybindings");
+  const keybindingDOMList: HTMLDivElement[] = [];
+  
+  //--------------
+  // Utils methods
+  //--------------
+  //Load previous config
+  const loadConfig = () => {
+    const config: Array<[string, string]> = JSON.parse(
+      fs.readFileSync(path.resolve(process.cwd(), "./storage.json"), {
+        encoding: "utf-8",
+      })
+    ).keybindings;
+    for (let keybinding of config) {
+      keyBindingsMap.set(keybinding[0], keybinding[1]);
     }
   };
-  const keyCombinationMap: Map<string, string> = new Map();
-  keyCombinationMap.set("LAlt+Key1", "Microsoft Teams");
+  
+  //Refresh config
+  const refreshConfig = () => {
+    fs.writeFileSync(
+      path.resolve(process.cwd(), "./storage.json"),
+      JSON.stringify(
+        {
+          keybindings: keyBindingsMap.entries(),
+        },
+        null,
+        2
+      )
+    );
+  };
+  
+  //Listen to keystrokes
+  const listenKeyStoke = (id: string) => {
+    const elem: HTMLDivElement = keybindingDOMList[+id];
+    const keyNode = Array.from(elem.children).filter(
+      (node) => node.id === "keys"
+    )[0];
+    const appName = elem.children[0].textContent;
+    let upInIteration: string[] = [];
+    let keyCombination: string[] = [];
+    globalkey.start(
+      (keys: string[]) => {
+        upInIteration.push(...keys);
+        upInIteration = [...new Set(upInIteration)];
+        keyCombination = [...upInIteration];
+        //rerender keys
+        keyNode.textContent = "";
+        for (let key of keyCombination) {
+          const div = document.createElement("div");
+          div.textContent = key;
+          div.classList.add(..."inline block fixed".split(" "));
+          keyNode.appendChild(div);
+        }
+        //refresh keyCombinationMap and storage.json
+        keyBindingsMap.set(appName, keyCombination.join("+"));
+        refreshConfig();
+      },
+      (keys: string[]) => {
+        keys.forEach((key) => {
+          if (upInIteration.includes(key)) {
+            upInIteration.splice(upInIteration.indexOf(key), 1);
+          }
+        });
+        if (upInIteration.length === 0) {
+          globalkey.stop();
+        }
+      }
+    );
+  };
+  
+  //Add a key value pair to the list
+  const addItem = (
+    appName: string = "AppName",
+    content: string = "Click to set keybindings"
+  ) => {
+    const div: HTMLDivElement = document.createElement("div");
+    div.classList.add(..."block px-20 py-10 no-click".split(" "));
+    const dt = document.createElement("dt");
+    dt.textContent = appName;
+    dt.classList.add(..."inline block accent fixed".split(" "));
+    const dd = document.createElement("dd");
+    dd.classList.add(..."inline wrapper block fixed".split(" "));
+    dd.id = "keys";
+    dd.textContent = content;
+    div.id = keybindingDOMList.length.toString();
+    div.addEventListener("click", function () {
+      listenKeyStoke(this.id);
+    });
+    div.appendChild(dt);
+    div.appendChild(dd);
+    list.appendChild(div);
+    keybindingDOMList.push(div);
+  };
+  
+  //Render loaded combinations from config.
+  const renderCombinations = () => {
+    keyBindingsMap.forEach((value: string, key: string) => addItem(key, value));
+  };
+  
+  //TO-DO
   const strokeActions = (keys: string[]) => {
     if (keys[0] && keys[1]) {
-      const windowName = keyCombinationMap.get(keys.reverse().join("+"));
+      const windowName = keyBindingsMap.get(keys.reverse().join("+"));
       if (windowName) {
         activeWindows.getProcesses((err: string, processes: Object[]) => {
           if (err) console.error(err);
@@ -27,13 +126,11 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
   };
-  globalkey.start(
-    (keys: string[]) => {
-      strokeActions(keys);
-    },
-    (keys: string[]) => {
-      replaceText("curr-keys", keys.join());
-      strokeActions(keys);
-    }
-  );
+
+  //-----------------
+  //   App Body
+  //----------------- 
+  loadConfig();
+  renderCombinations();
+  document.getElementById("button").addEventListener("click", () => addItem());
 });
