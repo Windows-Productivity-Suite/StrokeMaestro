@@ -2,11 +2,11 @@
   "keybindings": [
     [
       "Microsoft Teams",
-      "LAlt+Key1"
+      "LAlt"
     ],
     [
       "AppName",
-      "A"
+      "LAlt"
     ]
   ]
 }

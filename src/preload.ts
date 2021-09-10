@@ -52,7 +52,8 @@ window.addEventListener("DOMContentLoaded", () => {
       (keys: string[]) => {
         upInIteration.push(...keys);
         upInIteration = [...new Set(upInIteration)];
-        keyCombination = [...upInIteration];
+        keyCombination.push(...keys);
+        keyCombination = [...new Set(keys)];
         //rerender keys
         keyNode.textContent = "";
         for (let key of keyCombination) {
@@ -81,7 +82,7 @@ window.addEventListener("DOMContentLoaded", () => {
   //Add a key value pair to the list
   const addItem = (
     appName: string = "AppName",
-    content: string = "Click to set keybindings"
+    keys: string[] = ["Click to set keybindings"]
   ) => {
     const div: HTMLDivElement = document.createElement("div");
     div.classList.add(..."block px-20 py-10 no-click".split(" "));
@@ -91,7 +92,12 @@ window.addEventListener("DOMContentLoaded", () => {
     const dd = document.createElement("dd");
     dd.classList.add(..."inline wrapper block fixed".split(" "));
     dd.id = "keys";
-    dd.textContent = content;
+    for (let key of keys) {
+      const keyNode = document.createElement("div");
+      keyNode.classList.add(..."inline block fixed".split(" "));
+      keyNode.textContent = key;
+      dd.appendChild(keyNode);
+    }
     div.id = keybindingDOMList.length.toString();
     div.addEventListener("click", function () {
       listenKeyStoke(this.id);
@@ -104,7 +110,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   //Render loaded combinations from config.
   const renderCombinations = () => {
-    keyBindingsMap.forEach((value: string, key: string) => addItem(key, value));
+    keyBindingsMap.forEach((value: string, key: string) =>
+      addItem(key, value.split("+"))
+    );
   };
 
   //TO-DO
