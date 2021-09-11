@@ -48,19 +48,24 @@ window.addEventListener("DOMContentLoaded", () => {
     const appName = elem.children[0].textContent;
     let upInIteration: string[] = [];
     let keyCombination: string[] = [];
+    let time: number = 0;
     globalkey.start(
       (keys: string[]) => {
+        time++;
+        if (time === 1) {
+          keyNode.textContent = "";
+        }
         upInIteration.push(...keys);
         upInIteration = [...new Set(upInIteration)];
-        keyCombination.push(...keys);
-        keyCombination = [...new Set(keys)];
         //rerender keys
-        keyNode.textContent = "";
-        for (let key of keyCombination) {
-          const div = document.createElement("div");
-          div.textContent = key;
-          div.classList.add(..."inline block fixed".split(" "));
-          keyNode.appendChild(div);
+        for (let key of keys) {
+          if (!keyCombination.includes(key)) {
+            const div = document.createElement("div");
+            div.textContent = key;
+            div.classList.add(..."inline block fixed".split(" "));
+            keyNode.appendChild(div);
+            keyCombination.push(key);
+          }
         }
         //refresh keyCombinationMap and storage.json
         keyBindingsMap.set(appName, keyCombination.join("+"));
