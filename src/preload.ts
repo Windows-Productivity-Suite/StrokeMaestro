@@ -41,7 +41,12 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   //Listen to keystrokes
+  let listeningForOthers: Boolean = false;
   const listenKeyStoke = (id: string) => {
+    if (listeningForOthers) {
+      return;
+    }
+    listeningForOthers = true;
     const elem: HTMLDivElement = keybindingDOMList[+id];
     const keyNode = Array.from(elem.children).filter(
       (node) => node.id === "keys"
@@ -77,7 +82,9 @@ window.addEventListener("DOMContentLoaded", () => {
           elem.remove();
           keyBindingsMap.delete(appName);
           refreshConfig();
+          listeningForOthers = false;
           globalkey.stop();
+          return;
         }
         keys.forEach((key) => {
           if (upInIteration.includes(key)) {
@@ -86,6 +93,7 @@ window.addEventListener("DOMContentLoaded", () => {
         });
         if (upInIteration.length === 0) {
           refreshConfig();
+          listeningForOthers = false;
           globalkey.stop();
         }
       }
