@@ -1,5 +1,3 @@
-import { app } from "electron";
-
 const fs = require("fs");
 const path = require("path");
 window.addEventListener("DOMContentLoaded", () => {
