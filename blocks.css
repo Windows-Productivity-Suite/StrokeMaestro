@@ -172,3 +172,9 @@ body {
 .no-click {
     cursor: default;
 }
+
+.drop-down {
+    padding: 1px;
+    border: var(--block-accent-color);
+    transform: translate(2px, 2px);
+}

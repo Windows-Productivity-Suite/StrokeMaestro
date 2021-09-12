@@ -1,10 +1,13 @@
+import { app } from "electron";
+
 const fs = require("fs");
 const path = require("path");
 window.addEventListener("DOMContentLoaded", () => {
   //--------------
   // Globals
   //--------------
-  const globalkey = require("globalkey");
+  const globalkey = require("globalkey"); // For recording the keystrokes
+  // const globalkey = require("globalkey"); // For listening to global key strokes
   const activeWindows = require("node-process-windows");
   const keyBindingsMap: Map<string, string> = new Map();
   const list = document.getElementById("keybindings");
@@ -45,7 +48,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const keyNode = Array.from(elem.children).filter(
       (node) => node.id === "keys"
     )[0];
-    const appName = elem.children[0].textContent;
+    const appName: string = (elem.children[0].children[0] as HTMLSelectElement)
+      .value;
     let upInIteration: string[] = [];
     let keyCombination: string[] = [];
     let time: number = 0;
@@ -62,22 +66,28 @@ window.addEventListener("DOMContentLoaded", () => {
           if (!keyCombination.includes(key)) {
             const div = document.createElement("div");
             div.textContent = key;
-            div.classList.add(..."inline block fixed".split(" "));
+            div.classList.add(..."inline block fixed key".split(" "));
             keyNode.appendChild(div);
             keyCombination.push(key);
           }
         }
-        //refresh keyCombinationMap and storage.json
+        //refresh keyCombinationMap
         keyBindingsMap.set(appName, keyCombination.join("+"));
-        refreshConfig();
       },
       (keys: string[]) => {
+        if (keys.includes("Escape")) {
+          elem.remove();
+          keyBindingsMap.delete(appName);
+          refreshConfig();
+          globalkey.stop();
+        }
         keys.forEach((key) => {
           if (upInIteration.includes(key)) {
             upInIteration.splice(upInIteration.indexOf(key), 1);
           }
         });
         if (upInIteration.length === 0) {
+          refreshConfig();
           globalkey.stop();
         }
       }
@@ -89,17 +99,39 @@ window.addEventListener("DOMContentLoaded", () => {
     appName: string = "AppName",
     keys: string[] = ["Click to set keybindings"]
   ) => {
+    const divClassList: string = "block px-20 py-10 no-click";
+    const ddClassList: string = "inline wrapper block fixed";
+    const dtClassList: string = "inline block accent fixed wrapper";
+    const selectClassList: string = "block accent drop-down";
+    const keyNodeClassList: string = "inline block fixed key";
+    const createOptions = (select: HTMLSelectElement, appName: string) => {
+      const option = document.createElement("option");
+      option.value = appName;
+      option.textContent = appName;
+      option.setAttribute("selected", "");
+      select.add(option);
+    };
+    //Div element
     const div: HTMLDivElement = document.createElement("div");
-    div.classList.add(..."block px-20 py-10 no-click".split(" "));
+    div.classList.add(...divClassList.split(" "));
+
+    //Dt element
     const dt = document.createElement("dt");
-    dt.textContent = appName;
-    dt.classList.add(..."inline block accent fixed".split(" "));
+    dt.classList.add(...dtClassList.split(" "));
+
+    //Select element
+    const select = document.createElement("select");
+    select.classList.add(...selectClassList.split(" "));
+    createOptions(select, appName);
+    dt.appendChild(select);
+
+    //DD element
     const dd = document.createElement("dd");
-    dd.classList.add(..."inline wrapper block fixed".split(" "));
     dd.id = "keys";
+    dd.classList.add(...ddClassList.split(" "));
     for (let key of keys) {
       const keyNode = document.createElement("div");
-      keyNode.classList.add(..."inline block fixed".split(" "));
+      keyNode.classList.add(...keyNodeClassList.split(" "));
       keyNode.textContent = key;
       dd.appendChild(keyNode);
     }
