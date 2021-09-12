@@ -4,8 +4,8 @@ window.addEventListener("DOMContentLoaded", () => {
   //--------------
   // Globals
   //--------------
-  const globalkey = require("globalkey"); // For recording the keystrokes
-  // const globalkey = require("globalkey"); // For listening to global key strokes
+  const recordKey = require("globalkey"); // For recording the keystrokes
+  const globalkey = require("globalkey"); // For listening to global key strokes
   const activeWindows = require("node-process-windows");
   const keyBindingsMap: Map<string, string> = new Map();
   const list = document.getElementById("keybindings");
@@ -56,7 +56,7 @@ window.addEventListener("DOMContentLoaded", () => {
     let upInIteration: string[] = [];
     let keyCombination: string[] = [];
     let time: number = 0;
-    globalkey.start(
+    recordKey.start(
       (keys: string[]) => {
         time++;
         if (time === 1) {
@@ -83,7 +83,7 @@ window.addEventListener("DOMContentLoaded", () => {
           keyBindingsMap.delete(appName);
           refreshConfig();
           listeningForOthers = false;
-          globalkey.stop();
+          recordKey.stop();
           return;
         }
         keys.forEach((key) => {
@@ -94,7 +94,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (upInIteration.length === 0) {
           refreshConfig();
           listeningForOthers = false;
-          globalkey.stop();
+          recordKey.stop();
         }
       }
     );
@@ -159,22 +159,19 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   //TO-DO
-  const strokeActions = (keys: string[]) => {
-    if (keys[0] && keys[1]) {
-      const windowName = keyBindingsMap.get(keys.reverse().join("+"));
-      if (windowName) {
-        activeWindows.getProcesses((err: string, processes: Object[]) => {
-          if (err) console.error(err);
-          let process = processes.filter(
-            (process) =>
-              //@ts-ignore
-              process.mainWindowTitle
-                .toLowerCase()
-                .indexOf(windowName.toLowerCase()) >= 0
-          );
-          if (process[0]) activeWindows.focusWindow(process[0]);
-        });
-      }
+  const strokeActions = (windowName: string) => {
+    if (windowName) {
+      activeWindows.getProcesses((err: string, processes: Object[]) => {
+        if (err) console.error(err);
+        let process = processes.filter(
+          (process) =>
+            //@ts-ignore
+            process.mainWindowTitle
+              .toLowerCase()
+              .indexOf(windowName.toLowerCase()) >= 0
+        );
+        if (process[0]) activeWindows.focusWindow(process[0]);
+      });
     }
   };
 
@@ -184,4 +181,35 @@ window.addEventListener("DOMContentLoaded", () => {
   loadConfig();
   renderCombinations();
   document.getElementById("button").addEventListener("click", () => addItem());
+  let keyCombination: string[] = [];
+  const isCombination = (keys: string[]): Boolean | string => {
+    let res: Boolean | string = false;
+    keyBindingsMap.forEach((value: string, key: string) => {
+      if (value === keys.join("+")) {
+        res = key;
+      }
+    });
+    return res;
+  };
+  globalkey.start(
+    (keys: string[]) => {
+      if (!listeningForOthers) {
+        keyCombination.push(...keys);
+        keyCombination = [...new Set(keyCombination)];
+        const res: Boolean | string = isCombination(keyCombination);
+        if (typeof res === "string") {
+          strokeActions(res);
+        }
+      }
+    },
+    (keys: string[]) => {
+      if (!listeningForOthers) {
+        keys.forEach((key: string) => {
+          if (keyCombination.includes(key)) {
+            keyCombination.splice(keyCombination.indexOf(key), 1);
+          }
+        });
+      }
+    }
+  );
 });
