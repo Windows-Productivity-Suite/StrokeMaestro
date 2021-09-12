@@ -185,7 +185,10 @@ window.addEventListener("DOMContentLoaded", () => {
   const isCombination = (keys: string[]): Boolean | string => {
     let res: Boolean | string = false;
     keyBindingsMap.forEach((value: string, key: string) => {
-      if (value === keys.join("+")) {
+      if (
+        value.split("+").filter((elem) => !(keys.indexOf(elem) !== -1))
+          .length === 0
+      ) {
         res = key;
       }
     });
