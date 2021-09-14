@@ -2,11 +2,12 @@ const fs = require("fs");
 const path = require("path");
 window.addEventListener("DOMContentLoaded", () => {
   //--------------
-  // Globals
+  // Global initializations
   //--------------
   const recordKey = require("globalkey"); // For recording the keystrokes
   const globalkey = require("globalkey"); // For listening to global key strokes
   const activeWindows = require("node-process-windows");
+  const installedSoftware = require("fetch-installed-software");
   const keyBindingsMap: Map<string, string> = new Map();
   const list = document.getElementById("keybindings");
   const keybindingDOMList: HTMLDivElement[] = [];
@@ -75,10 +76,11 @@ window.addEventListener("DOMContentLoaded", () => {
           }
         }
         //refresh keyCombinationMap
-        keyBindingsMap.set(appName, keyCombination.join("+"));
+        if (appName !== "None")
+          keyBindingsMap.set(appName, keyCombination.join("+"));
       },
       (keys: string[]) => {
-        if (keys.includes("Escape")) {
+        if (keys.includes("Escape") && appName !== "None") {
           elem.remove();
           keyBindingsMap.delete(appName);
           refreshConfig();
@@ -91,13 +93,26 @@ window.addEventListener("DOMContentLoaded", () => {
             upInIteration.splice(upInIteration.indexOf(key), 1);
           }
         });
-        if (upInIteration.length === 0) {
+        if (upInIteration.length === 0 && appName !== "None") {
           refreshConfig();
           listeningForOthers = false;
           recordKey.stop();
         }
       }
     );
+  };
+
+  // Fetch installed softwares
+  const getInstalledSoftwares = (): string[] => {
+    const contents = installedSoftware
+      .getAllInstalledSoftwareSync()
+      .filter((software: Object) =>
+        //@ts-ignore
+        software.DisplayName ? true : false
+      )
+      //@ts-ignore
+      .map((software: Object) => software.DisplayName);
+    return contents;
   };
 
   //Add a key value pair to the list
@@ -110,12 +125,18 @@ window.addEventListener("DOMContentLoaded", () => {
     const dtClassList: string = "inline block accent fixed wrapper";
     const selectClassList: string = "block accent drop-down";
     const keyNodeClassList: string = "inline block fixed key";
-    const createOptions = (select: HTMLSelectElement, appName: string) => {
-      const option = document.createElement("option");
-      option.value = appName;
-      option.textContent = appName;
-      option.setAttribute("selected", "");
-      select.add(option);
+    const createOptions = (select: HTMLSelectElement) => {
+      const softwares: string[] = getInstalledSoftwares();
+      if (appName === "AppName") {
+        softwares.unshift("None");
+      }
+      for (let software of softwares) {
+        const option = document.createElement("option");
+        option.value = software.trim();
+        option.textContent = software.trim();
+        if (software === appName) option.setAttribute("selected", "");
+        select.add(option);
+      }
     };
     //Div element
     const div: HTMLDivElement = document.createElement("div");
@@ -128,7 +149,7 @@ window.addEventListener("DOMContentLoaded", () => {
     //Select element
     const select = document.createElement("select");
     select.classList.add(...selectClassList.split(" "));
-    createOptions(select, appName);
+    createOptions(select);
     dt.appendChild(select);
 
     //DD element
@@ -158,8 +179,8 @@ window.addEventListener("DOMContentLoaded", () => {
     );
   };
 
-  //TO-DO
-  const strokeActions = (windowName: string) => {
+  // Activate the window
+  const strokeAction = (windowName: string) => {
     if (windowName) {
       activeWindows.getProcesses((err: string, processes: Object[]) => {
         if (err) console.error(err);
@@ -185,10 +206,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const isCombination = (keys: string[]): Boolean | string => {
     let res: Boolean | string = false;
     keyBindingsMap.forEach((value: string, key: string) => {
-      if (
-        value.split("+").filter((elem) => !(keys.indexOf(elem) !== -1))
-          .length === 0
-      ) {
+      if (keys.join("+") === value) {
         res = key;
       }
     });
@@ -201,7 +219,7 @@ window.addEventListener("DOMContentLoaded", () => {
         keyCombination = [...new Set(keyCombination)];
         const res: Boolean | string = isCombination(keyCombination);
         if (typeof res === "string") {
-          strokeActions(res);
+          strokeAction(res);
         }
       }
     },

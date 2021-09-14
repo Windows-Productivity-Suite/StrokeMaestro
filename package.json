@@ -24,6 +24,7 @@
         "typescript": "^4.3.5"
     },
     "dependencies": {
+        "fetch-installed-software": "^0.0.7",
         "globalkey": "^1.0.7",
         "node-process-windows": "^0.0.2"
     }

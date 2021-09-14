@@ -1,8 +1,12 @@
 {
   "keybindings": [
     [
-      "Microsoft Teams",
+      "Google Chrome",
       "LAlt+Key1"
+    ],
+    [
+      "Launch4j 3.12",
+      "D+F"
     ]
   ]
 }

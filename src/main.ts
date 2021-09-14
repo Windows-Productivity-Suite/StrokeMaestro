@@ -10,7 +10,7 @@ function createWindow() {
       nodeIntegration: true,
     },
     width: 800,
-    icon: path.join(__dirname , "../icon.png"),
+    icon: path.join(__dirname, "../icon.png"),
   });
 
   // and load the index.html of the app.
