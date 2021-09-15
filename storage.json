@@ -1,12 +1,16 @@
 {
   "keybindings": [
     [
-      "Google Chrome",
-      "LAlt+Key1"
-    ],
-    [
       "Launch4j 3.12",
       "D+F"
+    ],
+    [
+      "Sublime Text 3",
+      "LAlt+Key3"
+    ],
+    [
+      "Google Chrome",
+      "LAlt+Key4"
     ]
   ]
 }

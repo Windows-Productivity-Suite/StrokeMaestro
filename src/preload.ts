@@ -52,8 +52,12 @@ window.addEventListener("DOMContentLoaded", () => {
     const keyNode = Array.from(elem.children).filter(
       (node) => node.id === "keys"
     )[0];
-    const appName: string = (elem.children[0].children[0] as HTMLSelectElement)
-      .value;
+    //@ts-ignore
+    const selectElement: HTMLSelectElement = elem.children[0].children[0];
+    let appName: string = selectElement.value;
+    selectElement.addEventListener("change", function () {
+      appName = this.value;
+    });
     let upInIteration: string[] = [];
     let keyCombination: string[] = [];
     let time: number = 0;
@@ -116,6 +120,7 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   //Add a key value pair to the list
+  const softwares: string[] = getInstalledSoftwares();
   const addItem = (
     appName: string = "AppName",
     keys: string[] = ["Click to set keybindings"]
@@ -126,11 +131,11 @@ window.addEventListener("DOMContentLoaded", () => {
     const selectClassList: string = "block accent drop-down";
     const keyNodeClassList: string = "inline block fixed key";
     const createOptions = (select: HTMLSelectElement) => {
-      const softwares: string[] = getInstalledSoftwares();
+      const localCopy = [...softwares];
       if (appName === "AppName") {
-        softwares.unshift("None");
+        localCopy.unshift("None");
       }
-      for (let software of softwares) {
+      for (let software of localCopy) {
         const option = document.createElement("option");
         option.value = software.trim();
         option.textContent = software.trim();
@@ -182,6 +187,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // Activate the window
   const strokeAction = (windowName: string) => {
     if (windowName) {
+      alert("Stroking:" + windowName);
       activeWindows.getProcesses((err: string, processes: Object[]) => {
         if (err) console.error(err);
         let process = processes.filter(
