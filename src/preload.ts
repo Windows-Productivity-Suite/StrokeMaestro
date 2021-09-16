@@ -43,6 +43,7 @@ window.addEventListener("DOMContentLoaded", () => {
       refreshConfig();
     } else {
       this.parentElement.parentElement.remove();
+      refreshConfig();
     }
   }
 
@@ -114,7 +115,6 @@ window.addEventListener("DOMContentLoaded", () => {
             selectElement.addEventListener("change", selectCallback);
           }
           listeningForOthers = false;
-          refreshConfig();
           elem.remove();
           recordKey.stop();
           return;
@@ -128,7 +128,6 @@ window.addEventListener("DOMContentLoaded", () => {
           listeningForOthers = false;
           selectElement.removeEventListener("change", localSelectCallback);
           selectElement.addEventListener("change", selectCallback);
-          refreshConfig();
           recordKey.stop();
         }
       }
@@ -228,7 +227,11 @@ window.addEventListener("DOMContentLoaded", () => {
               .toLowerCase()
               .indexOf(windowName.toLowerCase()) >= 0
         );
-        if (process[0]) activeWindows.focusWindow(process[0]);
+        console.log(process);
+        if (process[0]) {
+          //@ts-ignore
+          activeWindows.focusWindow(process[0].pid);
+        }
       });
     }
   };
