@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { checkSimilarity } = require("./checkSimilarity");
 
 window.addEventListener("DOMContentLoaded", () => {
   //--------------
@@ -217,15 +218,15 @@ window.addEventListener("DOMContentLoaded", () => {
   // Activate the window
   const strokeAction = (windowName: string) => {
     if (windowName) {
-      alert("Stroking:" + windowName);
       activeWindows.getProcesses((err: string, processes: Object[]) => {
         if (err) console.error(err);
         let process = processes.filter(
           (process) =>
-            //@ts-ignore
-            process.mainWindowTitle
-              .toLowerCase()
-              .indexOf(windowName.toLowerCase()) >= 0
+            checkSimilarity(
+              //@ts-ignore
+              process.processName.toLowerCase(),
+              windowName.toLowerCase()
+            ) >= 0.72
         );
         console.log(process);
         if (process[0]) {
