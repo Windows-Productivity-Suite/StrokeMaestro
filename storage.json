@@ -1,16 +1,12 @@
 {
   "keybindings": [
     [
-      "Launch4j 3.12",
-      "D+F"
-    ],
-    [
       "Sublime Text 3",
       "LAlt+Key3"
     ],
     [
-      "OBS Studio",
-      "H+O+W"
+      "Google Chrome",
+      "LAlt+Key4"
     ]
   ]
 }

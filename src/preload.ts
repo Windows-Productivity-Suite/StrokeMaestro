@@ -41,6 +41,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (this.value !== "None") {
       keyBindingsMap.set(this.value, bindings);
       refreshConfig();
+    } else {
+      this.parentElement.parentElement.remove();
     }
   }
 
@@ -60,7 +62,7 @@ window.addEventListener("DOMContentLoaded", () => {
   let listeningForOthers: Boolean = false;
   const listenKeyStoke = (id: string) => {
     if (listeningForOthers) {
-      return;
+      recordKey.stop();
     }
     listeningForOthers = true;
     const elem: HTMLDivElement = keybindingDOMList[+id];
@@ -99,17 +101,21 @@ window.addEventListener("DOMContentLoaded", () => {
           }
         }
         //refresh keyCombinationMap
-        if (appName !== "None")
+        if (appName !== "None" && keyCombination.length > 0) {
           keyBindingsMap.set(appName, keyCombination.join("+"));
+          refreshConfig();
+        }
       },
       (keys: string[]) => {
-        if (keys.includes("Escape") && appName !== "None") {
-          elem.remove();
-          keyBindingsMap.delete(appName);
-          refreshConfig();
-          selectElement.removeEventListener("change", localSelectCallback);
-          selectElement.addEventListener("change", selectCallback);
+        if (keys.includes("Escape")) {
+          if (appName !== "None") {
+            keyBindingsMap.delete(appName);
+            selectElement.removeEventListener("change", localSelectCallback);
+            selectElement.addEventListener("change", selectCallback);
+          }
           listeningForOthers = false;
+          refreshConfig();
+          elem.remove();
           recordKey.stop();
           return;
         }
@@ -119,10 +125,10 @@ window.addEventListener("DOMContentLoaded", () => {
           }
         });
         if (upInIteration.length === 0 && appName !== "None") {
-          refreshConfig();
           listeningForOthers = false;
           selectElement.removeEventListener("change", localSelectCallback);
           selectElement.addEventListener("change", selectCallback);
+          refreshConfig();
           recordKey.stop();
         }
       }
