@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+
 window.addEventListener("DOMContentLoaded", () => {
   //--------------
   // Global initializations
@@ -15,17 +16,6 @@ window.addEventListener("DOMContentLoaded", () => {
   //--------------
   // Utils methods
   //--------------
-  //Load previous config
-  const loadConfig = () => {
-    const config: Array<[string, string]> = JSON.parse(
-      fs.readFileSync(path.resolve(process.cwd(), "./storage.json"), {
-        encoding: "utf-8",
-      })
-    ).keybindings;
-    for (let keybinding of config) {
-      keyBindingsMap.set(keybinding[0], keybinding[1]);
-    }
-  };
 
   //Refresh config
   const refreshConfig = () => {
@@ -39,6 +29,31 @@ window.addEventListener("DOMContentLoaded", () => {
         2
       )
     );
+  };
+
+  let prevValue: string = "";
+  function prevCallback() {
+    prevValue = this.value;
+  }
+  function selectCallback() {
+    const bindings = keyBindingsMap.get(prevValue);
+    keyBindingsMap.delete(prevValue);
+    if (this.value !== "None") {
+      keyBindingsMap.set(this.value, bindings);
+      refreshConfig();
+    }
+  }
+
+  //Load previous config
+  const loadConfig = () => {
+    const config: Array<[string, string]> = JSON.parse(
+      fs.readFileSync(path.resolve(process.cwd(), "./storage.json"), {
+        encoding: "utf-8",
+      })
+    ).keybindings;
+    for (let keybinding of config) {
+      keyBindingsMap.set(keybinding[0], keybinding[1]);
+    }
   };
 
   //Listen to keystrokes
@@ -55,9 +70,13 @@ window.addEventListener("DOMContentLoaded", () => {
     //@ts-ignore
     const selectElement: HTMLSelectElement = elem.children[0].children[0];
     let appName: string = selectElement.value;
-    selectElement.addEventListener("change", function () {
+    function localSelectCallback() {
       appName = this.value;
-    });
+    }
+    if (appName === "None") {
+      selectElement.removeEventListener("change", selectCallback);
+      selectElement.addEventListener("change", localSelectCallback);
+    }
     let upInIteration: string[] = [];
     let keyCombination: string[] = [];
     let time: number = 0;
@@ -88,6 +107,8 @@ window.addEventListener("DOMContentLoaded", () => {
           elem.remove();
           keyBindingsMap.delete(appName);
           refreshConfig();
+          selectElement.removeEventListener("change", localSelectCallback);
+          selectElement.addEventListener("change", selectCallback);
           listeningForOthers = false;
           recordKey.stop();
           return;
@@ -100,6 +121,8 @@ window.addEventListener("DOMContentLoaded", () => {
         if (upInIteration.length === 0 && appName !== "None") {
           refreshConfig();
           listeningForOthers = false;
+          selectElement.removeEventListener("change", localSelectCallback);
+          selectElement.addEventListener("change", selectCallback);
           recordKey.stop();
         }
       }
@@ -154,6 +177,8 @@ window.addEventListener("DOMContentLoaded", () => {
     //Select element
     const select = document.createElement("select");
     select.classList.add(...selectClassList.split(" "));
+    select.addEventListener("change", selectCallback);
+    select.addEventListener("focus", prevCallback);
     createOptions(select);
     dt.appendChild(select);
 
