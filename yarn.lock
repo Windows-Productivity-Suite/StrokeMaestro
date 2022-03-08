@@ -470,10 +470,10 @@ electron-build-env@^0.2.0:
     commander "^2.9.0"
     mkdirp "^0.5.1"
 
-electron@^16.0.2:
-  version "16.0.2"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-16.0.2.tgz#6d0ae3152c410478dfffdbf80852a3840679b8c5"
-  integrity sha512-kT746yVMztrP4BbT3nrFNcUcfgFu2yelUw6TWBVTy0pju+fBISaqcvoiMrq+8U0vRpoXSu2MJYygOf4T0Det7g==
+electron@^17.1.1:
+  version "17.1.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-17.1.1.tgz#a936907faf68a0a4ae24e8f79c8b22995661c54b"
+  integrity sha512-S+PIsCOfxB+9DkPsbnWpbLQx6+3P5FGedCeVQ/vhZEX8zD4Wj2F118HGFX6ShEfsaTYE623ESK/f+b2ueHpEpQ==
   dependencies:
     "@electron/get" "^1.13.0"
     "@types/node" "^14.6.2"
